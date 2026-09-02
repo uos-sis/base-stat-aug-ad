@@ -1,0 +1,52 @@
+import argparse
+
+parser = argparse.ArgumentParser(description='Denoise')
+parser.add_argument('--raw_data_dir', type=str, default='../raw_data')
+parser.add_argument('--dir_data', type=str, default='./data')
+parser.add_argument('--data_set', type=str, default='wikipedia', choices=('wikipedia', 'reddit', 'mooc', 'alipay'))
+parser.add_argument('--bipartite', action='store_true', default=True)
+parser.add_argument('--mode', type=str, default='sad', choices=('origin', 'gdn', 'sad')) #模型名
+parser.add_argument('--add_scl', action='store_true', default=False)
+parser.add_argument('--module_type', type=str, default='graph_attention', choices=('graph_attention', 'graph_sum'))
+parser.add_argument('--mask_label', action='store_true', default=False)
+parser.add_argument('--mask_ratio', type=float, default=0.5)
+parser.add_argument('--train_split', type=float, default=0.7)
+parser.add_argument('--val_split', type=float, default=0.15)
+parser.add_argument('--test_split', type=float, default=0.15)
+# add
+parser.add_argument('--dev_alpha', type=float, default=1.0, help="dev loss inlier_loss param")
+parser.add_argument('--dev_beta', type=float, default=1.0, help="dev loss outlier_loss param")
+parser.add_argument('--anomaly_alpha', type=float, default=1e-1, help="gnn anomaly loss param")
+parser.add_argument('--supc_alpha', type=float, default=5e-3, help="gnn supc loss param")
+parser.add_argument('--memory_size', type=int, default=5000, help="gdn memory_size")
+parser.add_argument('--sample_size', type=int, default=2000, help="gdn sample_size")
+parser.add_argument('--upsample_anomalies', action='store_true', default=False, help="Oversample anomaly edges in the training split (up_sample_data)")
+parser.add_argument('--train_drop_rate', type=float, default=0.0, help="Fraction of train edges dropped per epoch via RandomDropSampler (0.0 = off)")
+
+##data param
+parser.add_argument('--n_neighbors', type=int, default=20, help='Maximum number of connected edge per node')
+parser.add_argument('--batch_size', type=int, default=256)
+parser.add_argument('--n_epochs', type=int, default=100)
+parser.add_argument('--patience', type=int, default=10, help="number of epochs the val ROC-AUC may stay without improvement before early stopping (0 disables)")
+parser.add_argument('--num_data_workers', type=int, default=25)
+parser.add_argument('--gpus', type=int, default=1)
+parser.add_argument('--accelerator', type=str, default='ddp')
+
+##model param
+parser.add_argument('--ckpt_file', type=str, default='./')
+parser.add_argument('--model_name', type=str, default='SAD', help='Name of the model used for checkpoint dir naming')
+parser.add_argument('--checkpoint_dir', type=str, default='./checkpoints', help='Root directory to save best model checkpoints')
+parser.add_argument('--hidden_dim', type=int, default=64)
+parser.add_argument('--n_heads', type=int, default=2)
+parser.add_argument('--drop_out', type=float, default=0.2)
+parser.add_argument('--n_layer', type=int, default=2, help='Number of network layers')
+parser.add_argument('--learning_rate', type=float, default=5e-4)
+parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+parser.add_argument('--use_wandb', action='store_true', default=True)
+parser.add_argument('--wandb_project', type=str, default='CNA2026_SAD')
+parser.add_argument('--wandb_entity', type=str, default=None)
+parser.add_argument('--wandb_run_name', type=str, default=None)
+parser.add_argument('--wandb_mode', type=str, default='online', choices=('online', 'offline', 'disabled'))
+parser.add_argument('--no_process_bar', action='store_true', help='Do not show the tqdm process bar')
+args = parser.parse_args()
+
